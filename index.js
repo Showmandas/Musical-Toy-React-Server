@@ -78,6 +78,22 @@ async function run() {
     res.send(result);
 })
 
+// search toy's data by name 
+app.get("/searchToys/:txt", async (req, res) => {
+  const searchToy = req.params.txt;
+  const result = await musicToysCollection
+    .find({
+       $or:[
+        {
+          toyname: { $regex: searchToy, $options: "i" } ,
+
+        }
+       ]
+      
+    })
+    .toArray();
+  res.send(result);
+});
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
