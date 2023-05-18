@@ -30,7 +30,8 @@ async function run() {
 
     // get all toy data 
     app.get('/alltoy',async(req,res)=>{
-      const result = await musicToysCollection.find().toArray();
+      const cursor =  musicToysCollection.find();
+      const result=await cursor.toArray()
       res.send(result);
      })
 
@@ -42,6 +43,7 @@ async function run() {
     res.send(result)
 
    })
+
   
 
 
