@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
 const cors=require('cors')
 require('dotenv').config()
 const port = process.env.port || 5000
@@ -27,12 +27,38 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const musicToysCollection=client.db('music').collection('musicData')
-
+    const indexKeys = { toyname: 1 };
+    const indexOptions = { name: "toyname" };
+    const result = await musicToysCollection.createIndex(indexKeys, indexOptions);
+ 
     // get all toy data 
     app.get('/alltoy',async(req,res)=>{
       const cursor =  musicToysCollection.find();
       const result=await cursor.toArray()
       res.send(result);
+     })
+
+    // show my toy data
+    app.get('/mytoy',async(req,res)=>{
+     console.log(req.query.email)
+     let query={}
+     if(req.query?.email){
+      query={email:req.query?.email}
+     }
+    const result=await musicToysCollection.find(query).toArray()
+    
+      res.send(result)
+      // console.log(result)
+     })
+  
+
+     //find one toy
+     app.get('/singletoy/:id',async(req,res)=>{
+      console.log(req.params.id);
+      const singleToy = await musicToysCollection.findOne({
+        _id: new ObjectId(req.params.id),
+      });
+      res.send(singleToy);
      })
 
      //insert toy data
@@ -44,7 +70,13 @@ async function run() {
 
    })
 
-  
+   //delete single toy data
+   app.delete('/alltoy/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) }
+    const result = await musicToysCollection.deleteOne(query);
+    res.send(result);
+})
 
 
     // Send a ping to confirm a successful connection
