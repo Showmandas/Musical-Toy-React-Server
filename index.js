@@ -78,6 +78,33 @@ async function run() {
     res.send(result);
 })
 
+// get specific toy's data 
+app.get('/mytoy/:id',async(req,res)=>{
+  const id=req.params.id
+  const filter={_id:new ObjectId(id)}
+  const result=await musicToysCollection.findOne(filter)
+  res.send(result)
+ })
+
+//  update users toy's data
+app.put('/mytoy/:id',async(req,res)=>{
+  const id=req.params.id
+  const filter={_id:new ObjectId(id)}
+  const options={upsert:true}
+  const updatedToy=req.body
+  const toy={
+    $set:{
+      toyname:updatedToy.toyname,
+      price:updatedToy.price,
+      photo:updatedToy.photo,
+      description:updatedToy.description,
+      rating:updatedToy.rating,
+      toyCategory:updatedToy.toyCategory,
+    }
+  }
+  const result=await musicToysCollection.updateOne(filter,toy,options)
+  res.send(result)
+})
 // search toy's data by name 
 app.get("/searchToys/:txt", async (req, res) => {
   const searchToy = req.params.txt;
