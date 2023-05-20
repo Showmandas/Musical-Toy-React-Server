@@ -23,32 +23,27 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     const musicToysCollection = client.db("music").collection("musicData");
-    const indexKeys = { toyname: 1 };
-    const indexOptions = { name: "toyname" };
-    const result = await musicToysCollection.createIndex(
-      indexKeys,
-      indexOptions
-    );
 
     // get all toy data
     app.get("/alltoy", async (req, res) => {
-      const cursor = musicToysCollection.find();
+      const cursor = musicToysCollection.find().limit(20);
       const result = await cursor.toArray();
       res.send(result);
     });
 
 
-    
-    app.get("/alltoy/:text", async (req, res) => {
-      console.log(req.params.text)
-      if(req.params.text =="classical" || req.params.text =="pop" || req.params.text =="hiphop" ){
-        const result=await musicToysCollection.find({status:req.params.text}).toArray()
-        return res.send(result)
-      }
-      const result=await musicToysCollection.find({}).toArray()
-      res.send(result)
+    //shop by category
+    app.get("/getCategory/:category", async (req, res) => {
+      console.log(req.params.id);
+      // if (req.params.category == "classical" || req.params.category == "pop") {
+      //   const result=await musicToysCollection().find({toyCategory:req.params.category}).toArray()
+      //   return res.send(result);
+      // }
+      const result = await musicToysCollection()
+        .find({ toyCategory: req.params.category })
+        .toArray();
+      res.send(result);
     });
-
 
     // show my toy data
     app.get("/mytoy", async (req, res) => {
@@ -101,17 +96,14 @@ async function run() {
     });
 
     app.get("/mytoy/:text", async (req, res) => {
-      // const sortTxt=req.params.text;
-      // const sortOption = req.query.sort === 'asc' ? 1 : -1;
-      if(req.params.text == 'ascending' || req.params.text == "descending"){
-        const result = await musicToysCollection.findOne({status:req.params.text}).sort({price:-1}).toArray()
-        console.log(result)
-        return res.send(result)
-      }
-      const result = await musicToysCollection.findOne({}).sort({price:-1}).toArray();
+      console.log(req.params.text)
+      const sortOption = req.query.text ? 1 : -1;
+      const result = await musicToysCollection
+        .find({})
+        .sort({ price: sortOption })
+        .toArray();
       res.send(result);
     });
-
 
     //  update users toy's data
     app.put("/mytoy/:id", async (req, res) => {
