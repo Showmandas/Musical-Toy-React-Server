@@ -31,9 +31,8 @@ async function run() {
       res.send(result);
     });
 
-
     //shop by category
-    app.get("/getCategory/:category", async (req, res) => {
+    app.get("/alltoy/:category", async (req, res) => {
       console.log(req.params.id);
       // if (req.params.category == "classical" || req.params.category == "pop") {
       //   const result=await musicToysCollection().find({toyCategory:req.params.category}).toArray()
@@ -52,10 +51,10 @@ async function run() {
       if (req.query?.email) {
         query = { email: req.query?.email };
       }
-      // const sortOption = req.query.sort === 'asc' ? 1 : -1;
+      // const sortOption = req.query.email == "ascending" ? 1 : -1;
       const result = await musicToysCollection
         .find(query)
-        // .sort({ price: sortOption })
+        // .sort({ toyname: sortOption })
         .toArray();
 
       res.send(result);
@@ -95,11 +94,13 @@ async function run() {
       res.send(result);
     });
 
+    //sort
     app.get("/mytoy/:text", async (req, res) => {
-      console.log(req.params.text)
+      console.log(req.params.text);
+
       const sortOption = req.query.text ? 1 : -1;
       const result = await musicToysCollection
-        .find({})
+        .find({ toyname: req.params.text })
         .sort({ price: sortOption })
         .toArray();
       res.send(result);
